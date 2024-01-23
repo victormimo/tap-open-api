@@ -1,0 +1,715 @@
+openapi: 3.1.0
+info:
+  title: TAP API
+  description: TAP API for creating objects in a Cap Table.
+  version: 1.0.0
+servers:
+  - url: https://tap.captable.ai
+    description: TAP server
+paths:
+  "/issuer/create":
+    post:
+      summary: Creates a new issuer.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                legal_name:
+                  type: string
+                dba:
+                  type: string
+                  description: Doing business as
+                formation_date:
+                  type: string
+                country_of_formation:
+                  type: string
+                  description:
+                    Type representation of an ISO 3166-1 alpha 2 country
+                    code
+                country_subdivision_of_formation:
+                  type: string
+                  description:
+                    Type representation of the second part of an ISO 3166-2
+                    country subdivision code
+                tax_ids:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      tax_id:
+                        type: string
+                      country:
+                        type: string
+                        description:
+                          Issuing country code (ISO 3166-1 alpha-2) for
+                          the tax identifier
+                    required:
+                      - tax_id
+                      - country
+                email:
+                  type: object
+                  properties:
+                    email_address:
+                      type: string
+                      format: email
+                    email_type:
+                      type: string
+                      enum:
+                        - PERSONAL
+                        - BUSINESS
+                        - OTHER
+                  required:
+                    - email_address
+                    - email_type
+                address:
+                  type: object
+                  properties:
+                    address_type:
+                      type: string
+                      enum:
+                        - LEGAL
+                        - CONTACT
+                        - OTHER
+                    street_suite:
+                      type: string
+                    city:
+                      type: string
+                    country_subdivision:
+                      type: string
+                      description:
+                        Type representation of the second part of an ISO
+                        3166-2 country subdivision code
+                    country:
+                      type: string
+                      description: Country code for this address (ISO 3166-1 alpha-2
+                    postal_code:
+                      type: string
+                  required:
+                    - address_type
+                    - country
+                initial_shares_authorized:
+                  type: string
+                comments:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - legal_name
+                - formation_date
+                - country_of_formation
+      responses:
+        "200":
+          description: Issuer successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  issuerId:
+                    type: string
+                    format: uuid
+  "/stakeholder/create":
+    post:
+      summary: Creates a new stakeholder.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                issuerId:
+                  type: string
+                  format: uuid
+                data:
+                  type: object
+                  properties:
+                    name:
+                      type: object
+                      properties:
+                        legal_name:
+                          type: string
+                        first_name:
+                          type: string
+                        last_name:
+                          type: string
+                      required:
+                        - legal_name
+                    stakeholder_type:
+                      type: string
+                      enum:
+                        - INDIVIDUAL
+                        - INSTITUTION
+                    issuer_assigned_id:
+                      type: string
+                    current_relationship:
+                      type: string
+                      enum:
+                        - ADVISOR
+                        - BOARD_MEMBER
+                        - CONSULTANT
+                        - EMPLOYEE
+                        - EX_ADVISOR
+                        - EX_CONSULTANT
+                        - EX_EMPLOYEE
+                        - EXECUTIVE
+                        - FOUNDER
+                        - INVESTOR
+                        - NON_US_EMPLOYEE
+                        - OFFICER
+                        - OTHER
+                    comments:
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - name
+                    - stakeholder_type
+              required:
+                - issuerId
+                - data
+      responses:
+        "200":
+          description: Stakeholder successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  stakeholderId:
+                    type: string
+                    format: uuid
+  "/stock-class/create":
+    post:
+      summary: Creates a new stock class.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                issuerId:
+                  type: string
+                  format: uuid
+                data:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description:
+                        Name for the stock type (e.g. Series A Preferred
+                        or Class A Common)
+                    class_type:
+                      type: string
+                      enum:
+                        - COMMON
+                        - PREFERRED
+                    default_id_prefix:
+                      type: string
+                      description:
+                        Default prefix for certificate numbers in certificated
+                        shares (e.g. CS- in CS-1). If certificate IDs have a dash,
+                        the prefix should end in the dash like CS-
+                    initial_shares_authorized:
+                      type: string
+                    board_approval_date:
+                      type: string
+                    stockholder_approval_date:
+                      type: string
+                    votes_per_share:
+                      type: string
+                      description:
+                        Fixed-point string representation of a number (up
+                        to 10 decimal places supported)
+                    par_value:
+                      type: object
+                      properties:
+                        amount:
+                          type: string
+                        currency:
+                          type: string
+                          description: ISO 4217 currency code
+                    price_per_share:
+                      type: object
+                      properties:
+                        amount:
+                          type: string
+                        currency:
+                          type: string
+                          description: ISO 4217 currency code
+                    seniority:
+                      type: string
+                    liquidation_preference_multiple:
+                      type: string
+                    participation_cap_multiple:
+                      type: string
+                    comments:
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - name
+                    - class_type
+                    - default_id_prefix
+                    - initial_shares_authorized
+                    - votes_per_share
+                    - seniority
+              required:
+                - issuerId
+                - data
+          responses:
+            "200":
+              description: Stock class successfully created
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                      stockClassId:
+                        type: string
+                        format: uuid
+      responses:
+        "200":
+          description: Stock Class successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  stockClassId:
+                    type: string
+                    format: uuid
+  "/stock-plan/create":
+    post:
+      summary: Creates a new stock plan.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                issuerId:
+                  type: string
+                  format: uuid
+                data:
+                  type: object
+                  properties:
+                    plan_name:
+                      type: string
+                    board_approval_date:
+                      type: string
+                    stockholder_approval_date:
+                      type: string
+                    initial_shares_reserved:
+                      type: string
+                    stock_class_id:
+                      type: string
+                    comments:
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - plan_name
+                    - stock_class_id
+                    - initial_shares_reserved
+              required:
+                - issuerId
+                - data
+        responses:
+          "200":
+            description: Stock plan successfully created
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                    stockPlanId:
+                      type: string
+                      format: uuid
+      responses:
+        "200":
+          description: Stock Plan successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  stockPlanId:
+                    type: string
+                    format: uuid
+  "/transactions/issuance/stock":
+    post:
+      summary: Creates a new stock issuance transaction.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                issuerId:
+                  type: string
+                  format: uuid
+                data:
+                  stock_class_id:
+                    type: string
+                  stock_plan_id:
+                    type: string
+                  share_price:
+                    type: object
+                    properties:
+                      amount:
+                        type: string
+                      currency:
+                        type: string
+                        description: ISO 4217 currency code
+                  quantity:
+                    type: string
+                  vesting_terms_id:
+                    type: string
+                  cost_basis:
+                    type: object
+                    properties:
+                      amount:
+                        type: string
+                      currency:
+                        type: string
+                        description: ISO 4217 currency code
+                  stock_legend_ids:
+                    type: array
+                    items:
+                      type: string
+                  issuance_type:
+                    type: string
+                    enum:
+                      - RSA
+                      - FOUNDERS_STOCK
+                  comments:
+                    type: array
+                    items:
+                      type: string
+                  stakeholder_id:
+                    type: string
+                  board_approval_date:
+                    type: string
+                    format: date
+                  stockholder_approval_date:
+                    type: string
+                    format: date
+                  consideration_text:
+                    type: string
+                  security_law_exemptions:
+                    type: array
+                    items:
+                      type: string
+                  required:
+                    - stock_class_id
+                    - share_price
+                    - quantity
+                    - stock_legend_ids
+              required:
+                - issuerId
+                - data
+      responses:
+        "200":
+          description: Stock issuance transaction successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  stockIssuanceId:
+                    type: string
+                    format: uuid
+  "/transactions/issuance/equity-compensation":
+    post:
+      summary: Creates a new equity compensation issuance transaction.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                issuerId:
+                  type: string
+                  format: uuid
+                data:
+                  type: object
+                  properties:
+                    stock_plan_id:
+                      type: string
+                    stock_class_id:
+                      type: string
+                    compensation_type:
+                      type: string
+                      enum:
+                        - OPTION_NSO
+                        - OPTION_ISO
+                        - OPTION
+                        - RSU
+                        - CSAR
+                        - SSAR
+                      description: |-
+                        Enumeration of equity compensation types (there are some things around the margins like RSAs that don't currently fit under the EquityCompensation umbrella but might arguably fall under this. If you want to create an RSA, create a stock issuance with vesting - you can link it to a plan as well, if you want).
+
+                        **The enums stand for:**
+                        1. OPTION_ISO (qualified)
+                        2. OPTION_NSO (non-qualified)
+                        3. OPTION (not NSO or ISO)
+                        4. RSU (restricted share units)
+                        5. CSAR(cash-settled stock appreciation rights)
+                        6. SSAR(stock-settled stock appreciation rights)
+                    option_grant_type:
+                      type: string
+                    quantity:
+                      type: string
+                    exercise_price:
+                      type: object
+                      properties:
+                        amount:
+                          type: string
+                        currency:
+                          type: string
+                          description: ISO 4217 currency code
+                    base_price:
+                      type: object
+                      properties:
+                        amount:
+                          type: string
+                        currency:
+                          type: string
+                          description: ISO 4217 currency code
+                    early_exercisable:
+                      type: boolean
+                      description:
+                        Is this Equity Compensation exercisable prior to
+                        completion of vesting? If so, it's assumed the vesting schedule
+                        will remain in effect but, instead of vesting a right to exercise,
+                        it becomes the schedule determining when a right to repurchase
+                        the resulting stock lapses.
+                    vesting_terms_id:
+                      type: string
+                    expiration_date:
+                      description: Expiration date of the plan security
+                      oneOf:
+                        - type: "null"
+                        - type: string
+                          format: date
+                    termination_exercise_windows:
+                      description:
+                        Exercise periods applicable to plan security after
+                        a termination for a given, enumerated reason
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          reason:
+                            type: string
+                            enum:
+                              - VOLUNTARY_OTHER
+                              - VOLUNTARY_GOOD_CAUSE
+                              - VOLUNTARY_RETIREMENT
+                              - INVOLUNTARY_OTHER
+                              - INVOLUNTARY_DEATH
+                              - INVOLUNTARY_DISABILITY
+                              - INVOLUNTARY_WITH_CAUSE
+                          period:
+                            description:
+                              The length of the period in this termination
+                              window (in number of periods of type period_type)
+                            type: integer
+                          period_type:
+                            description:
+                              The type of period being measured (e.g. days
+                              or month)
+                            type: string
+                            enum:
+                              - DAYS
+                              - MONTHS
+                              - YEARS
+                        required:
+                          - reason
+                          - period
+                          - period_type
+                    comments:
+                      type: array
+                      items:
+                        type: string
+                    date:
+                      type: string
+                      format: date
+                    stakeholder_id:
+                      type: string
+                    board_approval_date:
+                      type: string
+                      format: date
+                    stockholder_approval_date:
+                      type: string
+                      format: date
+                    consideration_text:
+                      type: string
+                    security_law_exemptions:
+                      type: array
+                      items:
+                        type: string
+                  required:
+                    - compensation_type
+                    - quantity
+                    - expiration_date
+                    - termination_exercise_windows
+              required:
+                - issuerId
+                - data
+        responses:
+          "200":
+            description: Equity compensation issuance transaction successfully created
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                    equityCompensationIssuanceId:
+                      type: string
+                      format: uuid
+      responses:
+        "200":
+          description: Equity Compensation Issuance successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  equityCompensationIssuance:
+                    type: string
+                    format: uuid
+  "/transactions/issuance/convertible":
+    post:
+      summary: Creates a new convertible issuance transaction.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                issuerId:
+                  type: string
+                  format: uuid
+                data:
+                  investment_amount:
+                    type: object
+                    properties:
+                      amount:
+                        type: string
+                      currency:
+                        type: string
+                        description: ISO 4217 currency code
+                  convertible_type:
+                    type: string
+                    enum:
+                      - NOTE
+                      - SAFE
+                      - CONVERTIBLE_SECURITY
+                    description:
+                      What kind of convertible instrument is this (of the
+                      supported, enumerated types)
+                  conversion_triggers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        trigger_id:
+                          type: string
+                        nickname:
+                          type: string
+                        trigger_description:
+                          type: string
+                        type:
+                          type: string
+                          enum:
+                            - AUTOMATIC_ON_CONDITION
+                        trigger_condition:
+                          type: string
+                          descripton: Long-form description of the trigger
+                        conversion_right:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                                - SAFE_CONVERSION
+                            conversion_timing:
+                              type: string
+                              enum:
+                                - PRE_MONEY
+                            conversion_mfn:
+                              type: boolean
+                        converts_to_future_round:
+                          type: boolean
+                  pro_rata:
+                    type: string
+                  seniority:
+                    type: integer
+                  comments:
+                    type: array
+                    items:
+                      type: string
+                  stakeholder_id:
+                    type: string
+                  board_approval_date:
+                    type: string
+                    format: date
+                  stockholder_approval_date:
+                    type: string
+                    format: date
+                  consideration_text:
+                    type: string
+                  security_law_exemptions:
+                    type: array
+                    items:
+                      type: string
+                  required:
+                    - convertible_type
+                    - investment_amount
+                    - conversion_triggers
+                    - seniority
+              required:
+                - issuerId
+                - data
+      responses:
+        "200":
+          description: Convertible issuance transaction successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  convertibleIssuanceId:
+                    type: string
+                    format: uuid
