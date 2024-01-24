@@ -1,4 +1,4 @@
-openapi: "3.1.0"
+openapi: "3.0.0"
 info:
   title: TAP API
   description: TAP API for creating objects in a Cap Table.
@@ -94,7 +94,7 @@ paths:
                 - formation_date
                 - country_of_formation
       responses:
-        '200':
+        "200":
           description: Issuer successfully created
           content:
             application/json:
@@ -168,7 +168,7 @@ paths:
                 - issuerId
                 - data
       responses:
-        '200':
+        "200":
           description: Stakeholder successfully created
           content:
             application/json:
@@ -254,7 +254,7 @@ paths:
                 - issuerId
                 - data
       responses:
-        '200':
+        "200":
           description: Stock class successfully created
           content:
             application/json:
@@ -305,7 +305,7 @@ paths:
                 - issuerId
                 - data
       responses:
-        '200':
+        "200":
           description: Stock Plan successfully created
           content:
             application/json:
@@ -394,7 +394,7 @@ paths:
                 - issuerId
                 - data
       responses:
-        '200':
+        "200":
           description: Stock issuance transaction successfully created
           content:
             application/json:
@@ -536,7 +536,7 @@ paths:
                 - issuerId
                 - data
       responses:
-        '200':
+        "200":
           description: Equity Compensation Issuance successfully created
           content:
             application/json:
@@ -643,7 +643,7 @@ paths:
                 - issuerId
                 - data
       responses:
-        '200':
+        "200":
           description: Convertible issuance transaction successfully created
           content:
             application/json:
